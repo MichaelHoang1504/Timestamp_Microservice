@@ -21,24 +21,26 @@ app.get("/", function (req, res) {
 const invalidDate = (date) => date.toUTCString()=== "Invalid Date";
 // your first API endpoint... 
 app.get("/api/:date", function (req, res) {
-  let date = new Date(req.params.date);
-  if(invalidDate(date)){
-    date=new Date(+req.params.date);
-  }
-  if(invalidDate(date)){
+  let date = !invalidDate(new Date(req.params.date))
+            ?new Date(req.params.date)
+            :!invalidDate(new Date(+req.params.date))
+            ?new Date(+req.params.date)
+            :null;
+  if(date===null){
     res.json({error: "Invalid Date"});
     return
+  } else {
+    res.json({
+      unix: date.getTime(),
+      utc:date.toUTCString()
+    });
   }
-  res.json({
-    unix: date.getTime(),
-    utc:date.toUTCString()});
 });
 app.get("/api", function (req, res) {
-  res.json({
+res.json({
     unix: new Date().getTime(),
     utc:new Date().toUTCString()});
-});
-
+  });
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
